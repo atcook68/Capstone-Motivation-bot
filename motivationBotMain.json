@@ -1,0 +1,142 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Resources": {
+      "LexBot": {
+          "Type": "AWS::Lex::Bot",
+          "Properties": {
+              "Name": "MotivatorBot",
+              "IdleSessionTTLInSeconds": 300,
+              "RoleArn": "Fill with your IAM role ARN",
+              "DataPrivacy": {
+                  "ChildDirected": false
+              }
+          },
+          "Metadata": {
+              "AWS::CloudFormation::Designer": {
+                  "id": "2da24186-e9f5-475f-88ad-800e0de775f1"
+              }
+          },
+          "DependsOn": [
+              "LambdaFunction"
+          ]
+      },
+      "KendraIndex": {
+          "Type": "AWS::Kendra::Index",
+          "Properties": {
+              "Name": "RunningMotivationalIndex",
+              "Description": "An index of documents about running motivation",
+              "RoleArn": "Fill with Kendra role ARN",
+              "Edition": "DEVELOPER_EDITION"
+          },
+          "Metadata": {
+              "AWS::CloudFormation::Designer": {
+                  "id": "65ddb86f-18a1-46d1-8461-1e58450334e5"
+              }
+          }
+      },
+      "LambdaFunction": {
+          "Type": "AWS::Lambda::Function",
+          "Properties": {
+              "FunctionName": "RunningMotivationalFunction",
+              "Code": {
+                  "S3Bucket": "cflambda-code",
+                  "S3Key": "lambda_code.py"
+              },
+              "Runtime": "python3.8",
+              "Handler": "lambda_code.lambda_handler",
+              "Role": "Fill with lambda role",
+              "Environment": {
+                  "Variables": {
+                      "kendra_index_id": {
+                          "Ref": "KendraIndex"
+                      }
+                  }
+              }
+          },
+          "Metadata": {
+              "AWS::CloudFormation::Designer": {
+                  "id": "3734fdec-ae03-4dbe-9001-09459cdca7e9"
+              }
+          }
+      },
+      "LambdaPermission": {
+          "Type": "AWS::Lambda::Permission",
+          "Properties": {
+              "FunctionName": {
+                  "Ref": "LambdaFunction"
+              },
+              "Principal": "lex.amazonaws.com",
+              "Action": "lambda:InvokeFunction"
+          },
+          "Metadata": {
+              "AWS::CloudFormation::Designer": {
+                  "id": "1a6858ee-32c5-4f62-803e-ae8f2322af50"
+              }
+          }
+      }
+  },
+  "Metadata": {
+      "AWS::CloudFormation::Designer": {
+          "65ddb86f-18a1-46d1-8461-1e58450334e5": {
+              "size": {
+                  "width": 60,
+                  "height": 60
+              },
+              "position": {
+                  "x": 60,
+                  "y": 90
+              },
+              "z": 1,
+              "embeds": []
+          },
+          "3734fdec-ae03-4dbe-9001-09459cdca7e9": {
+              "size": {
+                  "width": 60,
+                  "height": 60
+              },
+              "position": {
+                  "x": 180,
+                  "y": 90
+              },
+              "z": 1,
+              "embeds": []
+          },
+          "1a6858ee-32c5-4f62-803e-ae8f2322af50": {
+              "size": {
+                  "width": 60,
+                  "height": 60
+              },
+              "position": {
+                  "x": 60,
+                  "y": 210
+              },
+              "z": 1,
+              "embeds": []
+          },
+          "2da24186-e9f5-475f-88ad-800e0de775f1": {
+              "size": {
+                  "width": 60,
+                  "height": 60
+              },
+              "position": {
+                  "x": 180,
+                  "y": 210
+              },
+              "z": 1,
+              "embeds": [],
+              "dependson": [
+                  "3734fdec-ae03-4dbe-9001-09459cdca7e9"
+              ]
+          },
+          "8921b801-b03e-4195-8cb2-1e8bb1deca6b": {
+              "source": {
+                  "id": "2da24186-e9f5-475f-88ad-800e0de775f1"
+              },
+              "target": {
+                  "id": "3734fdec-ae03-4dbe-9001-09459cdca7e9"
+              },
+              "z": 11
+          }
+      }
+  }
+}
